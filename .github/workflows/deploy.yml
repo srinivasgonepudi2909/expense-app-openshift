@@ -1,0 +1,79 @@
+name: Build and Push Docker Images to AWS ECR
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  ECR_URI: 025066240744.dkr.ecr.us-east-1.amazonaws.com/openshift-images-repo
+
+jobs:
+  push-images:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name:  Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build and Push frontend Image
+      run: |
+        docker build -t $ECR_URI:frontend ./frontend
+        docker push $ECR_URI:frontend
+
+    - name: Build and Push backend API Image
+      run: |
+        docker build -t $ECR_URI:backend ./backend
+        docker push $ECR_URI:backend
+
+    - name: 🛠 Build and Push mysql Custom Image
+      run: |
+        docker build -t $ECR_URI:mysql ./mysql
+        docker push $ECR_URI:mysql
+
+    # - name: 📦 Install OpenShift CLI
+    #   run: |
+    #     curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz
+    #     tar -xzf oc.tar.gz
+    #     sudo mv oc /usr/local/bin/
+
+    # - name: 🔐 Login to OpenShift Sandbox
+    #   run: |
+    #     oc login ${{ secrets.OCP_API_URL }} \
+    #       --token=${{ secrets.OCP_TOKEN }} \
+    #       --insecure-skip-tls-verify=true    
+    
+    # - name: 📁 Set Project Namespace
+    #   run: |
+    #     oc project srinivas-gonepudi-dev
+
+    # - name: 🚀 Deploy MongoDB to OpenShift
+    #   run: |
+    #     oc apply -f manifests/mongodb-deployment.yaml
+
+    # - name: 🚀 Deploy catalogue to OpenShift
+    #   run: |
+    #     oc apply -f manifests/catalogue-api-deployment.yaml
+
+    # - name: 🚀 Deploy to OpenShift
+    #   run: |
+    #     oc apply -f manifests/nginx-web-deployment.yaml
+
+    #     for pod in $(oc get pods -n srinivas-gonepudi-dev -l app=nginx-web -o name); do
+    #       oc delete $pod -n srinivas-gonepudi-dev --grace-period=0 --force || true
+    #     done
+
+    #     oc rollout restart deployment/nginx-web -n srinivas-gonepudi-dev
+    #     oc rollout status deployment/nginx-web -n srinivas-gonepudi-dev --timeout=90s
+            
