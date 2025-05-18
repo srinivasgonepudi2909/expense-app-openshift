@@ -58,7 +58,15 @@ jobs:
     - name: 📁 Set Project Namespace
       run: |
         oc project srinivas-gonepudi-dev
-        
-    - name: Deploy to OpenShift
+
+    - name: Deploy mysql to OpenShift
       run: |
-        oc apply -f manifests/
+        oc apply -f manifests/mysql.yaml
+
+    - name: Deploy backend to OpenShift
+      run: |
+        oc apply -f manifests/backend.yaml
+
+    - name: Deploy frontend to OpenShift
+      run: |
+        oc apply -f manifests/frontend.yaml      
