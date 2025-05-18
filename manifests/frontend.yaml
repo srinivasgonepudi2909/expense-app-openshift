@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
+  namespace: srinivas-gonepudi-dev
   labels:
     app: frontend
     tier: web
