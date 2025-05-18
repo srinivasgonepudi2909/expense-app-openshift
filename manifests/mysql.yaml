@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+    tier: mysql
+    project: expense
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+      tier: mysql
+      project: expense
+  template:
+    metadata:
+      labels:
+        app: mysql
+        tier: mysql
+        project: expense
+    spec:
+      containers:
+        - name: mysql
+          image: 25066240744.dkr.ecr.us-east-1.amazonaws.com/openshift-images-repo:mysql
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: mypassword   # 🔐 Use secrets in real environments
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+      volumes:
+        - name: mysql-storage
+          emptyDir: {}
+
+      imagePullSecrets:
+        - name: aws-ecr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  selector:
+    app: mysql
+    tier: mysql
+    project: expense
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306

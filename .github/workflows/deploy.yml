@@ -42,38 +42,19 @@ jobs:
         docker build -t $ECR_URI:mysql ./mysql
         docker push $ECR_URI:mysql
 
-    # - name: 📦 Install OpenShift CLI
-    #   run: |
-    #     curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz
-    #     tar -xzf oc.tar.gz
-    #     sudo mv oc /usr/local/bin/
+    - name: Install OpenShift CLI (oc)
+      run: |
+        curl -LO "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz"
+        tar -xvf openshift-client-linux.tar.gz -C /usr/local/bin
+        chmod +x /usr/local/bin/oc
 
-    # - name: 🔐 Login to OpenShift Sandbox
-    #   run: |
-    #     oc login ${{ secrets.OCP_API_URL }} \
-    #       --token=${{ secrets.OCP_TOKEN }} \
-    #       --insecure-skip-tls-verify=true    
-    
-    # - name: 📁 Set Project Namespace
-    #   run: |
-    #     oc project srinivas-gonepudi-dev
+    - name: Login to OpenShift
+      env:
+        OPENSHIFT_SERVER_URL: ${{ secrets.OPENSHIFT_SERVER_URL }}
+        OPENSHIFT_API_TOKEN: ${{ secrets.OPENSHIFT_API_TOKEN }}
+      run: |
+        oc login --token=$OPENSHIFT_API_TOKEN --server=$OPENSHIFT_SERVER_URL
 
-    # - name: 🚀 Deploy MongoDB to OpenShift
-    #   run: |
-    #     oc apply -f manifests/mongodb-deployment.yaml
-
-    # - name: 🚀 Deploy catalogue to OpenShift
-    #   run: |
-    #     oc apply -f manifests/catalogue-api-deployment.yaml
-
-    # - name: 🚀 Deploy to OpenShift
-    #   run: |
-    #     oc apply -f manifests/nginx-web-deployment.yaml
-
-    #     for pod in $(oc get pods -n srinivas-gonepudi-dev -l app=nginx-web -o name); do
-    #       oc delete $pod -n srinivas-gonepudi-dev --grace-period=0 --force || true
-    #     done
-
-    #     oc rollout restart deployment/nginx-web -n srinivas-gonepudi-dev
-    #     oc rollout status deployment/nginx-web -n srinivas-gonepudi-dev --timeout=90s
-            
+    - name: Deploy to OpenShift
+      run: |
+        oc apply -f manifests/
