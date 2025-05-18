@@ -69,4 +69,10 @@ jobs:
 
     - name: Deploy frontend to OpenShift
       run: |
-        oc apply -f manifests/frontend.yaml      
+        oc apply -f manifests/frontend.yaml
+    - name: 🔍 Debug Show All Resources
+      run: |
+        oc get all -n srinivas-gonepudi-dev
+        oc get pods -n srinivas-gonepudi-dev
+        oc get deployment -n srinivas-gonepudi-dev
+    
