@@ -28,7 +28,6 @@ spec:
             - containerPort: 8080
           securityContext:
             runAsNonRoot: true
-            runAsUser: 1001
       imagePullSecrets:
         - name: aws-ecr-secret
 

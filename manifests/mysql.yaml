@@ -34,7 +34,6 @@ spec:
               mountPath: /var/lib/mysql
           securityContext:
             runAsNonRoot: true
-            runAsUser: 1001
       volumes:
         - name: mysql-storage
           emptyDir: {}
