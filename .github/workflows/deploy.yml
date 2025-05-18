@@ -67,6 +67,12 @@ jobs:
       run: |
         oc apply -f manifests/backend.yaml
 
+    - name: Restart Deployments
+      run: |
+        oc rollout restart deployment/backend -n srinivas-gonepudi-dev
+        oc rollout restart deployment/frontend -n srinivas-gonepudi-dev
+        oc rollout restart deployment/mysql -n srinivas-gonepudi-dev    
+
     - name: Deploy frontend to OpenShift
       run: |
         oc apply -f manifests/frontend.yaml
